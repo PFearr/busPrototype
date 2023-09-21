@@ -87,5 +87,5 @@ async function createServerExpress() {
 createServerExpress().then((app) => {
   let port = process.env.PORT || 3000;
   app.listen(port);
-  console.log(`Server running at ${VITE_APIURL}`);
+  console.log(`Server running at ${process.env.VITE_APIURL}`);
 });
