@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon server.js --ignore src --ignore data --ignore dist",
+    "dev": "cross-env NODE_ENV=development node server.js --ignore src --ignore data --ignore dist",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client --ssrManifest",
     "build:server": "vite build --ssr src/entry.server.jsx --outDir dist/server",

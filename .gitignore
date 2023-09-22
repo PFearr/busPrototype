@@ -9,3 +9,4 @@ package-lock.json
 .git
 .replit
 replit.nix
+vite.config.js*
