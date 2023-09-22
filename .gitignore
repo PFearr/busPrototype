@@ -8,5 +8,6 @@ package-lock.json
 .config
 .git
 .replit
+.env
 replit.nix
 vite.config.js*

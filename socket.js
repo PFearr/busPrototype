@@ -11,6 +11,7 @@ export default (io) => {
         socket.on("setBusses",(busses)=>{
             fs.writeFileSync("./data/busses.json",JSON.stringify(busses))
             io.emit("busses",busses)
+            socket.emit("busses",busses)
             socket.emit("success","Busses updated")
         })
     })

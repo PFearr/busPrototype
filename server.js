@@ -3,6 +3,7 @@ import fsp from "fs/promises";
 import fs from "fs";
 import express from "express";
 import { Server } from "socket.io";
+import 'dotenv/config'
 import process from "process";
 import socketModule from "./socket.js"
 import {createServer} from "http";
