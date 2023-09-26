@@ -8,6 +8,10 @@ import process from "process";
 import socketModule from "./socket.js"
 import {createServer} from "http";
 import { createRequire } from "module";
+import wifi from "node-wifi"
+wifi.init({
+  iface: null // network interface, choose a random wifi interface if set to null
+});
 let __dirname = path.dirname(new URL(import.meta.url).pathname);
 __dirname = __dirname.replace("/C:/", "C:/");
 let require = createRequire(import.meta.url);
@@ -46,6 +50,24 @@ async function createServerExpress() {
     app.use(require("compression")());
     app.use(express.static(resolve("dist/client")));
   }
+
+  app.get("/isStaff",(req,res)=>{
+    wifi
+    .getCurrentConnections()
+    .then((currentConnections) => {
+      if (currentConnections.length > 0) {
+        const ssid = currentConnections[0].mac;
+        res.json({isStaff: ssid === process.env.STAFFSSID})
+        
+      } else {
+        res.json({isStaff: false})
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send('Error fetching WiFi information');
+    });
+  })
 
   app.use("*", async (req, res) => {
     let url = req.originalUrl;
@@ -88,5 +110,6 @@ async function createServerExpress() {
 createServerExpress().then((app) => {
   let port = process.env.PORT || 3000;
   app.listen(port);
-  console.log(`Server running at ${process.env.VITE_APIURL}`);
+
+  console.log(`Server running Successfully!`);
 });

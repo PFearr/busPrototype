@@ -14,5 +14,24 @@ export default (io) => {
             socket.emit("busses",busses)
             socket.emit("success","Busses updated")
         })
+        socket.on("clear",()=>{
+            let amount = 11
+            let clear = {
+                "left": [],
+                "right": [],
+                "other": [],
+                "notHere": [],
+                "leftSchool": [],
+            }
+            for(let i = 0; i < amount; i++){
+                clear.left.push("")
+                clear.right.push("")
+                clear.other.push("")
+            }
+            fs.writeFileSync("./data/busses.json",JSON.stringify(clear))
+            io.emit("busses",clear)
+            socket.emit("busses",clear)
+            socket.emit("success","Busses cleared")
+        })
     })
 }

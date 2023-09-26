@@ -33,3 +33,26 @@ code {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.bus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+.bus-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.bus-time {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import socketFunction from './socket';
 import { useEffect, useState, useRef } from 'react';
 import BusSvG from './busSvgAdmin';
+import Popup from './popup';
 export default function BusPreview() {
     const [socket, setSocket] = useState(null);
     const [busses, setBusses] = useState([]);
@@ -9,12 +10,21 @@ export default function BusPreview() {
         width: "50%",
         height: "5%"
     });
+    const [bussesnothereArray, setBussesnothereArray] = useState([]);
+    const [newBussesForLeft, setBussesleft] = useState([]);
+
     const [towns, setTowns] = useState([]);
 
 
     const [loaded, setLoading] = useState(false);
     const [loadingBusQuote, setLoadingBusQuote] = useState("Loading up bus locations");
     const loadingRef = useRef(null);
+
+
+    const [popupHidden, setPopuphidden] = useState(true);
+
+
+
     useEffect(() => {
         if (loaded) {
             loadingRef.current.style.opacity = 0;
@@ -34,6 +44,16 @@ export default function BusPreview() {
         })
         socket.on('busses', data => {
             setBusses(data);
+            let newBussesForNotHere = [];
+            let newBussesForLeft = [];
+            data.notHere.forEach(bus => {
+                newBussesForNotHere.push(bus.town)
+            })
+            data.leftSchool.forEach(bus => {
+                newBussesForLeft.push(bus.town)
+            })
+            setBussesnothereArray(newBussesForNotHere);
+            setBussesleft(newBussesForLeft);
             setTimeout(() => {
                 setLoading(true)
             }, 500);
@@ -47,6 +67,111 @@ export default function BusPreview() {
     }, [])
     return (
         <>
+            <Popup setHiddenn={
+                setPopuphidden
+            } socket={socket} hidden={
+                popupHidden
+            } title={
+                "Extra Options"
+            }
+            onSave={
+                ()=>{
+                    socket.emit("setBusses", busses) 
+                }
+            }
+
+                children={
+                    <div>
+                        <p>Set Busses that left the school</p>
+                        {
+                            towns.map(town => {
+                                return (
+                                    <>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                defaultValue=""
+                                                defaultChecked={
+                                                    newBussesForLeft.includes(town)
+                                                }
+                                                id={town+"leftschool"}
+                                                name={town}
+                                                onChange={
+                                                    (e) => {
+                                                        let newBusses = busses;
+                                                        if (e.target.checked) {
+                                                            newBusses.leftSchool.push({
+                                                                town: e.target.name,
+                                                                time: new Date().getTime()
+                                                            })
+                                                        } else {
+                                                            for (let i = 0; i < newBusses.leftSchool.length; i++) {
+                                                                if (newBusses.leftSchool[i].town == e.target.name) {
+                                                                    newBusses.leftSchool.splice(i, 1);
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        setBusses(newBusses);
+                                                    }
+                                                }
+                                            />
+                                            <label className="form-check-label" htmlFor={town+"leftschool"}>
+                                                {town}
+                                            </label>
+                                        </div>
+                                    </>
+
+                                )
+                            })
+                        }<br/>
+                        <p>Set Busses haven't arrived to the school</p>
+                        {
+                            towns.map(town => {
+                                return (
+                                    <>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                defaultValue=""
+                                                defaultChecked={
+                                                    bussesnothereArray.includes(town)
+                                                }
+                                                id={town+"nothere"}
+                                                name={town}
+                                                onChange={
+                                                    (e) => {
+                                                        let newBusses = busses;
+                                                        if (e.target.checked) {
+                                                            newBusses.notHere.push({
+                                                                town: e.target.name,
+                                                                time: new Date().getTime()
+                                                            })
+                                                        } else {
+                                                            for (let i = 0; i < newBusses.notHere.length; i++) {
+                                                                if (newBusses.notHere[i].town == e.target.name) {
+                                                                    newBusses.notHere.splice(i, 1);
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        setBusses(newBusses);
+                                                    }
+                                                }
+                                            />
+                                            <label className="form-check-label" htmlFor={town+"nothere"}>
+                                                {town}
+                                            </label>
+                                        </div>
+                                    </>
+
+                                )
+                            })
+                        }
+                    </div>
+                } />
             <div className="loading" ref={
                 loadingRef
             } style={{
@@ -69,7 +194,7 @@ export default function BusPreview() {
             {
                 loaded == false ? null : <main>
                     <div id="home" className="active">
-                        <button style={{
+                        <button className='changemoblie' style={{
                             width: "auto",
                             height: "auto",
                             backgroundColor: "green",
@@ -82,7 +207,9 @@ export default function BusPreview() {
                             borderRadius: "10px",
                             color: "white",
                             fontSize: "1.5em",
-                        }} onClick={
+                        }} 
+                        
+                        onClick={
                             () => {
                                 // check if duplicate busses
                                 let checked = [];
@@ -111,6 +238,18 @@ export default function BusPreview() {
                                         checked.push({ bus: bus, index: index, pos: "Right" });
                                     }
                                 });
+                                busses.other.forEach((bus, index) => {
+                                    if (bus != "" && !duplicate) {
+                                        for (let i = 0; i < checked.length; i++) {
+                                            if (checked[i].bus == bus) {
+                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Other ${index + 1}`)
+                                                duplicate = true;
+                                                return;
+                                            }
+                                        }
+                                        checked.push({ bus: bus, index: index, pos: "Other" });
+                                    }
+                                });
                                 if (!duplicate) {
                                     socket.emit("setBusses", busses)
                                 }
@@ -118,7 +257,7 @@ export default function BusPreview() {
                         }>
                             Set Busses
                         </button>
-                        <button style={{
+                        <button className='changemoblie' style={{
                             width: "auto",
                             height: "auto",
                             backgroundColor: "red",
@@ -137,12 +276,31 @@ export default function BusPreview() {
                                 if (!confirm) return;
                                 confirm = window.confirm("Are you really sure? This action cannot be undone.");
                                 if (!confirm) return;
-                                setBusses({ left: ["", "", "", "", "", "", "", "", "", "", ""], right: ["", "", "", "", "", "", "", "", "", "", ""] });
-                                socket.emit("setBusses", { left: ["", "", "", "", "", "", "", "", "", "", ""], right: ["", "", "", "", "", "", "", "", "", "", ""] });
+                                socket.emit("clear");
                                 window.location.reload();
                             }
                         }>
                             Clear
+                        </button>
+                        <button className='changemoblie' style={{
+                            width: "auto",
+                            height: "auto",
+                            backgroundColor: "blue",
+                            marginTop: "10%",
+                            // top center
+                            position: "absolute",
+                            right: "0",
+                            top: "20%",
+                            transform: "translate(0%, 0%)",
+                            borderRadius: "10px",
+                            color: "white",
+                            fontSize: "1.5em",
+                        }} onClick={
+                            () => {
+                                setPopuphidden(false)
+                            }
+                        }>
+                            Extra Options
                         </button>
                         <div className="bus-list" style={{
                             width: "50%",
@@ -212,7 +370,39 @@ export default function BusPreview() {
                                 )
                             })}</div>
                         </div>
-
+                        <div className="bus-list" style={{
+                            width: "50%",
+                            height: "100%",
+                            marginTop: "10%"
+                        }}>
+                            <h1>Other</h1>
+                            <div style={{
+                                width: "50%",
+                                height: "100%"
+                            }}>{busses?.other?.map((bus, index) => {
+                                return (
+                                    <BusSvG index={
+                                        index
+                                    }
+                                        busses={
+                                            busses
+                                        }
+                                        towns={
+                                            towns
+                                        }
+                                        setBus={
+                                            (bus, index) => {
+                                                let newBusses = busses;
+                                                newBusses.other[index] = bus;
+                                                setBusses(newBusses);
+                                            }
+                                        }
+                                        width={busSize.width} height={busSize.height} bus={bus} isLast={
+                                            index == busses.left.length - 1
+                                        } />
+                                )
+                            })}</div>
+                        </div>
                     </div>
 
                 </main>

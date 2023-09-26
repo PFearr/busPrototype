@@ -3,12 +3,17 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 import "./components/busPreview"
 import BusPreview from "./components/busPreview";
 import AdminPreview from "./components/busAdmin";
+import BusStatus from "./components/busstatus";
 import "./css/android.css"
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<BusPreview />} />
+        <Route path="*" element={<BusPreview />} />
+      </Route>
+      <Route path="/status" element={<Layout />}>
+        <Route index element={<BusStatus />} />
         <Route path="*" element={<BusPreview />} />
       </Route>
       <Route path="/admin/setbus" element={<Layout />}>
@@ -22,6 +27,17 @@ export default function App() {
 function Layout() {
   const [drawer, setDrawer] = React.useState(false);
   const [drawerRef, setDrawerRef] = React.useState(null);
+  const [isStaff, setIsStaff] = React.useState(false);
+  React.useEffect(() => {
+    fetch("/isStaff",{
+      method: "GET",
+      credentials: "include"
+    }).then((res) => {
+      res.json().then((data) => {
+        setIsStaff(data.isStaff)
+      })
+    })
+  },[])
   React.useEffect(() => {
     if (drawerRef) {
       if (drawer) {
@@ -81,6 +97,15 @@ function Layout() {
         <Link to="/">
           Bus List
         </Link>
+        <Link to="/status">
+          Bus Status
+        </Link>
+        {
+          isStaff ? <Link to="/admin/setbus">
+            Admin Page
+          </Link> : null
+
+        }
       </aside>
 
       <Outlet />

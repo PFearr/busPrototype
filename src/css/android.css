@@ -136,3 +136,11 @@ svg {
   height: 24px;
   fill: #fff;
 }
+
+/* check if user is moblie */
+@media only screen and (max-device-width: 732px){
+  .changemoblie {
+    font-size: 1rem !important;
+    margin-top: 180vh !important;
+  }
+}

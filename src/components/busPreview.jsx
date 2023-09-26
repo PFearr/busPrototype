@@ -102,6 +102,28 @@ export default function BusPreview() {
                             )
                         })}</div>
                     </div>
+                    <div className="bus-list" style={{
+                        width: "50%",
+                        height: "100%",
+                        marginTop: "10%"
+                    }}>
+                        <h1>Other</h1>
+                        <div style={{
+                            width: "50%",
+                            height: "100%",
+                        }}>{busses?.other?.map((bus, index) => {
+                            return (
+                                <BusSvG index={
+                                    index
+                                }
+                                width={busSize.width} height={busSize.height} bus={
+                                    bus
+                                } isLast={
+                                    index == busses.left.length - 1
+                                } />
+                            )
+                        })}</div>
+                    </div>
                 </div>
             </main>
             <div id="backdrop" />
