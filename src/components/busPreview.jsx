@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useFetcher } from 'react-router-dom';
 import socketFunction from './socket';
 import { useEffect, useState, useRef } from 'react';
 import BusSvG from './busSvg';
+import CacheClass from './cache';
 export default function BusPreview() {
     const [socket, setSocket] = useState(null);
     const [busses, setBusses] = useState([]);
@@ -9,10 +10,19 @@ export default function BusPreview() {
         width: "50%",
         height: "5%"
     });
+    const cache = new CacheClass();
+
 
     const [loaded,setLoading] = useState(false);
+    useEffect(()=>{
+        if (cache.get("busses")){
+            setBusses(cache.get("busses"));
+            setLoading(true);
+        }
+    },[])
     const [loadingBusQuote, setLoadingBusQuote] = useState("Loading up bus locations");
     const loadingRef = useRef(null);
+    
     useEffect(()=>{
         if (loaded){
             loadingRef.current.style.opacity = 0;
@@ -27,6 +37,7 @@ export default function BusPreview() {
         socket.emit('getBusses');
         socket.on('busses', data => {
             setBusses(data);
+            cache.set("busses", data);
             setTimeout(() => {
                 setLoading(true)
             }, 1000);

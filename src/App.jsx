@@ -14,6 +14,19 @@ export default function App() {
   </div>
   `);
   React.useEffect(() => {
+    window.addEventListener("beforeunload", handleUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, []);
+
+  const handleUnload = (e) => {
+    localStorage.clear();
+  };
+  React.useEffect(() => {
+    // clear local storage
+    
+    localStorage.clear();
     fetch("/help", {
       method: "POST",
       credentials: "include"
@@ -87,7 +100,10 @@ function Layout() {
   
   return (
     <div>
-      <div className="app-bar">
+      <div style={{
+        zIndex: 99999,
+        position: "relative",
+      }} className="app-bar">
         <button className="menu" onClick={
           () => {
             setDrawer(!drawer)

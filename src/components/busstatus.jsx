@@ -3,9 +3,11 @@ import socketFunction from './socket';
 import { useEffect, useState, useRef } from 'react';
 import BusSvG from './busSvg';
 import moment from 'moment';
+import CacheClass from './cache';
 export default function BusPreview() {
     const [socket, setSocket] = useState(null);
     const [busses, setBusses] = useState([]);
+    const cache = new CacheClass();
     const [busSize, setBusSize] = useState({
         width: "50%",
         height: "5%"
@@ -22,12 +24,19 @@ export default function BusPreview() {
             }, 500);
         }
     }, [loaded])
+    useEffect(()=>{
+        if (cache.get("busses")){
+            setBusses(cache.get("busses"));
+            setLoading(true);
+        }
+    },[])
     useEffect(() => {
         const socket = socketFunction();
         setSocket(socket);
         socket.emit('getBusses');
         socket.on('busses', data => {
             setBusses(data);
+            cache.set("busses", data);
             setTimeout(() => {
                 setLoading(true)
             }, 1000);

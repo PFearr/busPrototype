@@ -3,9 +3,10 @@ import socketFunction from './socket';
 import { useEffect, useState, useRef } from 'react';
 import BusSvG from './busSvgAdmin';
 import Popup from './popup';
+import CacheClass from './cache';
 export default function BusPreview() {
     const [authorized, setAuthorized] = useState(false);
-
+    const cache = new CacheClass();
     useEffect(() => {
         fetch("/authorized", {
             method: "POST",
@@ -36,6 +37,18 @@ export default function BusPreview() {
     const [popupHidden, setPopuphidden] = useState(true);
 
 
+    useEffect(()=>{
+        if (cache.get("busses")){
+            setBusses(cache.get("busses"))
+            setLoading(false)
+        }
+        if (cache.get("bussesnothereArray")){
+            setBussesnothereArray(cache.get("bussesnothereArray"))
+        }
+        if (cache.get("bussesleft")){
+            setBussesleft(cache.get("bussesleft"))
+        }
+    },[])
 
     useEffect(() => {
         if (loaded) {
@@ -56,6 +69,7 @@ export default function BusPreview() {
         })
         socket.on('busses', data => {
             setBusses(data);
+            cache.set("busses", data)
             let newBussesForNotHere = [];
             let newBussesForLeft = [];
             data.notHere.forEach(bus => {
@@ -64,7 +78,9 @@ export default function BusPreview() {
             data.leftSchool.forEach(bus => {
                 newBussesForLeft.push(bus.town)
             })
+            cache.set("bussesnothereArray", newBussesForNotHere)
             setBussesnothereArray(newBussesForNotHere);
+            cache.set("bussesleft", newBussesForLeft)
             setBussesleft(newBussesForLeft);
             setTimeout(() => {
                 setLoading(true)
