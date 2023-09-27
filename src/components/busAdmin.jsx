@@ -238,6 +238,8 @@ export default function BusPreview() {
                                         onClick={
                                             () => {
                                                 // check if duplicate busses
+                                                let confirm = window.confirm("Are you sure you want to set the busses? This action cannot be undone.");
+                                                if (!confirm) return;
                                                 let checked = [];
                                                 let duplicate = false;
                                                 busses.left.forEach((bus, index) => {

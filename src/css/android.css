@@ -136,9 +136,21 @@ svg {
   height: 24px;
   fill: #fff;
 }
-
+select { 
+  z-index: 100;
+}
 /* check if user is moblie */
-@media only screen and (max-device-width: 732px){
+@media only screen and (max-device-width: 900px){
+  .modal {
+    font-size: small !important;
+  }
+}
+@media only screen and (min-device-width: 2560px){
+  * {
+    font-size: 1vw !important;
+  }
+}
+@media only screen and (max-device-width: 800px){
   .changemoblie {
     font-size: 1rem !important;
     margin-top: 180vh !important;

@@ -132,7 +132,7 @@ export default function BusPreview() {
                                     {
                                         busses?.notHere?.map((bus, index) => {
                                             return (
-                                                <div key={index} className="bus" style={{
+                                                <div key={index} className="bus mobliefriendly" style={{
                                                     width: "100%",
                                                     height: "30%",
                                                     display: "flex",
@@ -143,7 +143,7 @@ export default function BusPreview() {
                                                     borderRadius: "5px",
                                                     margin: "5px"
                                                 }}>
-                                                    <div className="bus-name">{bus.town}</div>
+                                                    <div className="bus-name mobliefriendly-text">{bus.town}</div>
                                                 </div>
                                             )
                                         })
@@ -160,7 +160,7 @@ export default function BusPreview() {
                                             borderRadius: "5px",
                                             margin: "5px"
                                         }}>
-                                            <div className="bus-name">All busses are here!</div>
+                                            <div className="bus-name mobliefriendly">All busses are here!</div>
                                         </div> : null
                                     }
                                 </div></div>

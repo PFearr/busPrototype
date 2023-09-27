@@ -56,3 +56,22 @@ code {
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
+
+/* lower fontSize on screen */
+
+@media only screen and (max-device-width: 800px){
+  span, p, h1, h2, h3, h4, h5, h6 {
+    font-size: 1.1rem !important;
+  }
+}
+@media only screen and (max-device-width: 355px){
+  .mobliefriendly-text {
+    font-size: 1rem;
+  }
+}
+
+@media only screen and (max-device-width: 732px){
+  select {
+    font-size: 1.5vh !important;
+  }
+}
