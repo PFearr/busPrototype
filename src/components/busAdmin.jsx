@@ -4,6 +4,18 @@ import { useEffect, useState, useRef } from 'react';
 import BusSvG from './busSvgAdmin';
 import Popup from './popup';
 export default function BusPreview() {
+    const [authorized, setAuthorized] = useState(false);
+
+    useEffect(() => {
+        fetch("/authorized", {
+            method: "POST",
+            credentials: "include"
+        }).then((res) => {
+            res.json().then((data) => {
+                setAuthorized(data.authorized)
+            })
+        })
+    }, [])
     const [socket, setSocket] = useState(null);
     const [busses, setBusses] = useState([]);
     const [busSize, setBusSize] = useState({
@@ -74,11 +86,11 @@ export default function BusPreview() {
             } title={
                 "Extra Options"
             }
-            onSave={
-                ()=>{
-                    socket.emit("setBusses", busses) 
+                onSave={
+                    () => {
+                        socket.emit("setBusses", busses)
+                    }
                 }
-            }
 
                 children={
                     <div>
@@ -95,7 +107,7 @@ export default function BusPreview() {
                                                 defaultChecked={
                                                     newBussesForLeft.includes(town)
                                                 }
-                                                id={town+"leftschool"}
+                                                id={town + "leftschool"}
                                                 name={town}
                                                 onChange={
                                                     (e) => {
@@ -117,7 +129,7 @@ export default function BusPreview() {
                                                     }
                                                 }
                                             />
-                                            <label className="form-check-label" htmlFor={town+"leftschool"}>
+                                            <label className="form-check-label" htmlFor={town + "leftschool"}>
                                                 {town}
                                             </label>
                                         </div>
@@ -125,7 +137,7 @@ export default function BusPreview() {
 
                                 )
                             })
-                        }<br/>
+                        }<br />
                         <p>Set Busses haven't arrived to the school</p>
                         {
                             towns.map(town => {
@@ -139,7 +151,7 @@ export default function BusPreview() {
                                                 defaultChecked={
                                                     bussesnothereArray.includes(town)
                                                 }
-                                                id={town+"nothere"}
+                                                id={town + "nothere"}
                                                 name={town}
                                                 onChange={
                                                     (e) => {
@@ -161,7 +173,7 @@ export default function BusPreview() {
                                                     }
                                                 }
                                             />
-                                            <label className="form-check-label" htmlFor={town+"nothere"}>
+                                            <label className="form-check-label" htmlFor={town + "nothere"}>
                                                 {town}
                                             </label>
                                         </div>
@@ -192,220 +204,237 @@ export default function BusPreview() {
                 <div className="loader"></div>
             </div>
             {
-                loaded == false ? null : <main>
-                    <div id="home" className="active">
-                        <button className='changemoblie' style={{
-                            width: "auto",
-                            height: "auto",
-                            backgroundColor: "green",
-                            marginTop: "10%",
-                            // top center
-                            position: "absolute",
-                            right: "0",
-                            top: "0%",
-                            transform: "translate(0%, 0%)",
-                            borderRadius: "10px",
-                            color: "white",
-                            fontSize: "1.5em",
-                        }} 
-                        
-                        onClick={
-                            () => {
-                                // check if duplicate busses
-                                let checked = [];
-                                let duplicate = false;
-                                busses.left.forEach((bus, index) => {
-                                    if (bus != "" && !duplicate) {
-                                        for (let i = 0; i < checked.length; i++) {
-                                            if (checked[i].bus == bus) {
-                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Left ${index + 1}`)
-                                                duplicate = true;
-                                                return;
-                                            }
-                                        }
-                                        checked.push({ bus: bus, index: index, pos: "Left" });
-                                    }
-                                });
-                                busses.right.forEach((bus, index) => {
-                                    if (bus != "" && !duplicate) {
-                                        for (let i = 0; i < checked.length; i++) {
-                                            if (checked[i].bus == bus) {
-                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Right ${index + 1}`)
-                                                duplicate = true;
-                                                return;
-                                            }
-                                        }
-                                        checked.push({ bus: bus, index: index, pos: "Right" });
-                                    }
-                                });
-                                busses.other.forEach((bus, index) => {
-                                    if (bus != "" && !duplicate) {
-                                        for (let i = 0; i < checked.length; i++) {
-                                            if (checked[i].bus == bus) {
-                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Other ${index + 1}`)
-                                                duplicate = true;
-                                                return;
-                                            }
-                                        }
-                                        checked.push({ bus: bus, index: index, pos: "Other" });
-                                    }
-                                });
-                                if (!duplicate) {
-                                    socket.emit("setBusses", busses)
-                                }
-                            }
-                        }>
-                            Set Busses
-                        </button>
-                        <button className='changemoblie' style={{
-                            width: "auto",
-                            height: "auto",
-                            backgroundColor: "red",
-                            marginTop: "10%",
-                            // top center
-                            position: "absolute",
-                            right: "0",
-                            top: "10%",
-                            transform: "translate(0%, 0%)",
-                            borderRadius: "10px",
-                            color: "white",
-                            fontSize: "1.5em",
-                        }} onClick={
-                            () => {
-                                let confirm = window.confirm("Are you sure you want to clear all busses? This action cannot be undone.");
-                                if (!confirm) return;
-                                confirm = window.confirm("Are you really sure? This action cannot be undone.");
-                                if (!confirm) return;
-                                socket.emit("clear");
-                                window.location.reload();
-                            }
-                        }>
-                            Clear
-                        </button>
-                        <button className='changemoblie' style={{
-                            width: "auto",
-                            height: "auto",
-                            backgroundColor: "blue",
-                            marginTop: "10%",
-                            // top center
-                            position: "absolute",
-                            right: "0",
-                            top: "20%",
-                            transform: "translate(0%, 0%)",
-                            borderRadius: "10px",
-                            color: "white",
-                            fontSize: "1.5em",
-                        }} onClick={
-                            () => {
-                                setPopuphidden(false)
-                            }
-                        }>
-                            Extra Options
-                        </button>
-                        <div className="bus-list" style={{
-                            width: "50%",
-                            height: "100%",
-                            marginTop: "10%"
-                        }}>
-                            <h1>Left</h1>
+                loaded == false ? null : <>
+                    {
+                        authorized == false ?
                             <div style={{
-                                width: "50%",
+                                width: "100%",
                                 height: "100%",
-                            }}>{busses?.left?.map((bus, index) => {
-                                return (
-                                    <BusSvG index={
-                                        index
-                                    }
-                                        busses={
-                                            busses
-                                        }
-                                        setBus={
-                                            (bus, index) => {
-                                                let newBusses = busses;
-                                                newBusses.left[index] = bus;
-                                                setBusses(newBusses);
-                                            }
-                                        }
-                                        towns={
-                                            towns
-                                        }
-                                        width={busSize.width} height={busSize.height} bus={
-                                            bus
-                                        } isLast={
-                                            index == busses.left.length - 1
-                                        } />
-                                )
-                            })}</div>
-                        </div>
-                        <div className="bus-list" style={{
-                            width: "50%",
-                            height: "100%",
-                            marginTop: "10%"
-                        }}>
-                            <h1>Right</h1>
-                            <div style={{
-                                width: "50%",
-                                height: "100%"
-                            }}>{busses?.right?.map((bus, index) => {
-                                return (
-                                    <BusSvG index={
-                                        index
-                                    }
-                                        busses={
-                                            busses
-                                        }
-                                        towns={
-                                            towns
-                                        }
-                                        setBus={
-                                            (bus, index) => {
-                                                let newBusses = busses;
-                                                newBusses.right[index] = bus;
-                                                setBusses(newBusses);
-                                            }
-                                        }
-                                        width={busSize.width} height={busSize.height} bus={bus} isLast={
-                                            index == busses.left.length - 1
-                                        } />
-                                )
-                            })}</div>
-                        </div>
-                        <div className="bus-list" style={{
-                            width: "50%",
-                            height: "100%",
-                            marginTop: "10%"
-                        }}>
-                            <h1>Other</h1>
-                            <div style={{
-                                width: "50%",
-                                height: "100%"
-                            }}>{busses?.other?.map((bus, index) => {
-                                return (
-                                    <BusSvG index={
-                                        index
-                                    }
-                                        busses={
-                                            busses
-                                        }
-                                        towns={
-                                            towns
-                                        }
-                                        setBus={
-                                            (bus, index) => {
-                                                let newBusses = busses;
-                                                newBusses.other[index] = bus;
-                                                setBusses(newBusses);
-                                            }
-                                        }
-                                        width={busSize.width} height={busSize.height} bus={bus} isLast={
-                                            index == busses.left.length - 1
-                                        } />
-                                )
-                            })}</div>
-                        </div>
-                    </div>
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                flexDirection: "column"
+                            }}>
+                                <h1>You are not authorized to view this page</h1>
+                                <Link to="/">Go back</Link>
+                            </div>
+                            : <main>
+                                <div id="home" className="active">
+                                    <button className='changemoblie' style={{
+                                        width: "auto",
+                                        height: "auto",
+                                        backgroundColor: "green",
+                                        marginTop: "10%",
+                                        // top center
+                                        position: "absolute",
+                                        right: "0",
+                                        top: "0%",
+                                        transform: "translate(0%, 0%)",
+                                        borderRadius: "10px",
+                                        color: "white",
+                                        fontSize: "1.5em",
+                                    }}
 
-                </main>
+                                        onClick={
+                                            () => {
+                                                // check if duplicate busses
+                                                let checked = [];
+                                                let duplicate = false;
+                                                busses.left.forEach((bus, index) => {
+                                                    if (bus != "" && !duplicate) {
+                                                        for (let i = 0; i < checked.length; i++) {
+                                                            if (checked[i].bus == bus) {
+                                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Left ${index + 1}`)
+                                                                duplicate = true;
+                                                                return;
+                                                            }
+                                                        }
+                                                        checked.push({ bus: bus, index: index, pos: "Left" });
+                                                    }
+                                                });
+                                                busses.right.forEach((bus, index) => {
+                                                    if (bus != "" && !duplicate) {
+                                                        for (let i = 0; i < checked.length; i++) {
+                                                            if (checked[i].bus == bus) {
+                                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Right ${index + 1}`)
+                                                                duplicate = true;
+                                                                return;
+                                                            }
+                                                        }
+                                                        checked.push({ bus: bus, index: index, pos: "Right" });
+                                                    }
+                                                });
+                                                busses.other.forEach((bus, index) => {
+                                                    if (bus != "" && !duplicate) {
+                                                        for (let i = 0; i < checked.length; i++) {
+                                                            if (checked[i].bus == bus) {
+                                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Other ${index + 1}`)
+                                                                duplicate = true;
+                                                                return;
+                                                            }
+                                                        }
+                                                        checked.push({ bus: bus, index: index, pos: "Other" });
+                                                    }
+                                                });
+                                                if (!duplicate) {
+                                                    socket.emit("setBusses", busses)
+                                                }
+                                            }
+                                        }>
+                                        Set Busses
+                                    </button>
+                                    <button className='changemoblie' style={{
+                                        width: "auto",
+                                        height: "auto",
+                                        backgroundColor: "red",
+                                        marginTop: "10%",
+                                        // top center
+                                        position: "absolute",
+                                        right: "0",
+                                        top: "10%",
+                                        transform: "translate(0%, 0%)",
+                                        borderRadius: "10px",
+                                        color: "white",
+                                        fontSize: "1.5em",
+                                    }} onClick={
+                                        () => {
+                                            let confirm = window.confirm("Are you sure you want to clear all busses? This action cannot be undone.");
+                                            if (!confirm) return;
+                                            confirm = window.confirm("Are you really sure? This action cannot be undone.");
+                                            if (!confirm) return;
+                                            socket.emit("clear");
+                                            window.location.reload();
+                                        }
+                                    }>
+                                        Clear
+                                    </button>
+                                    <button className='changemoblie' style={{
+                                        width: "auto",
+                                        height: "auto",
+                                        backgroundColor: "blue",
+                                        marginTop: "10%",
+                                        // top center
+                                        position: "absolute",
+                                        right: "0",
+                                        top: "20%",
+                                        transform: "translate(0%, 0%)",
+                                        borderRadius: "10px",
+                                        color: "white",
+                                        fontSize: "1.5em",
+                                    }} onClick={
+                                        () => {
+                                            setPopuphidden(false)
+                                        }
+                                    }>
+                                        Extra Options
+                                    </button>
+                                    <div className="bus-list" style={{
+                                        width: "50%",
+                                        height: "100%",
+                                        marginTop: "10%"
+                                    }}>
+                                        <h1>Left</h1>
+                                        <div style={{
+                                            width: "50%",
+                                            height: "100%",
+                                        }}>{busses?.left?.map((bus, index) => {
+                                            return (
+                                                <BusSvG index={
+                                                    index
+                                                }
+                                                    busses={
+                                                        busses
+                                                    }
+                                                    setBus={
+                                                        (bus, index) => {
+                                                            let newBusses = busses;
+                                                            newBusses.left[index] = bus;
+                                                            setBusses(newBusses);
+                                                        }
+                                                    }
+                                                    towns={
+                                                        towns
+                                                    }
+                                                    width={busSize.width} height={busSize.height} bus={
+                                                        bus
+                                                    } isLast={
+                                                        index == busses.left.length - 1
+                                                    } />
+                                            )
+                                        })}</div>
+                                    </div>
+                                    <div className="bus-list" style={{
+                                        width: "50%",
+                                        height: "100%",
+                                        marginTop: "10%"
+                                    }}>
+                                        <h1>Right</h1>
+                                        <div style={{
+                                            width: "50%",
+                                            height: "100%"
+                                        }}>{busses?.right?.map((bus, index) => {
+                                            return (
+                                                <BusSvG index={
+                                                    index
+                                                }
+                                                    busses={
+                                                        busses
+                                                    }
+                                                    towns={
+                                                        towns
+                                                    }
+                                                    setBus={
+                                                        (bus, index) => {
+                                                            let newBusses = busses;
+                                                            newBusses.right[index] = bus;
+                                                            setBusses(newBusses);
+                                                        }
+                                                    }
+                                                    width={busSize.width} height={busSize.height} bus={bus} isLast={
+                                                        index == busses.left.length - 1
+                                                    } />
+                                            )
+                                        })}</div>
+                                    </div>
+                                    <div className="bus-list" style={{
+                                        width: "50%",
+                                        height: "100%",
+                                        marginTop: "10%"
+                                    }}>
+                                        <h1>Other</h1>
+                                        <div style={{
+                                            width: "50%",
+                                            height: "100%"
+                                        }}>{busses?.other?.map((bus, index) => {
+                                            return (
+                                                <BusSvG index={
+                                                    index
+                                                }
+                                                    busses={
+                                                        busses
+                                                    }
+                                                    towns={
+                                                        towns
+                                                    }
+                                                    setBus={
+                                                        (bus, index) => {
+                                                            let newBusses = busses;
+                                                            newBusses.other[index] = bus;
+                                                            setBusses(newBusses);
+                                                        }
+                                                    }
+                                                    width={busSize.width} height={busSize.height} bus={bus} isLast={
+                                                        index == busses.left.length - 1
+                                                    } />
+                                            )
+                                        })}</div>
+                                    </div>
+                                </div>
+
+                            </main>
+                    }
+
+                </>
             }
         </>
 

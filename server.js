@@ -6,8 +6,9 @@ import { Server } from "socket.io";
 import 'dotenv/config'
 import process from "process";
 import socketModule from "./socket.js"
-import {createServer} from "http";
+import { createServer } from "http";
 import { createRequire } from "module";
+
 import wifi from "node-wifi"
 wifi.init({
   iface: null // network interface, choose a random wifi interface if set to null
@@ -50,23 +51,51 @@ async function createServerExpress() {
     app.use(require("compression")());
     app.use(express.static(resolve("dist/client")));
   }
-
-  app.get("/isStaff",(req,res)=>{
-    wifi
-    .getCurrentConnections()
-    .then((currentConnections) => {
-      if (currentConnections.length > 0) {
-        const ssid = currentConnections[0].mac;
-        res.json({isStaff: ssid === process.env.STAFFSSID})
-        
-      } else {
-        res.json({isStaff: false})
-      }
+  app.post("/help",(req,res)=>{
+    // ./config/helpPage.html
+    let fileContent = fs.readFileSync(resolve("config/helpPage.html"),"utf8")
+    res.json({
+      html: fileContent
+      
     })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error fetching WiFi information');
-    });
+  })
+  app.post("/authorized", (req, res) => {
+    if (process.env.AUTHFromWifi == "true" || process.env.AUTHFromWifi == true || process.env.AUTHFromWifi == "1" || process.env.AUTHFromWifi == "True") {
+      wifi
+        .getCurrentConnections()
+        .then((currentConnections) => {
+          if (currentConnections.length > 0) {
+            const ssid = currentConnections[0].mac;
+            res.json({ authorized: ssid === process.env.STAFFSSID })
+
+          } else {
+            res.json({ authorized: false })
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send('Error fetching WiFi information');
+        });
+    } else {
+      res.json({ authorized: true })
+    }
+  })
+  app.get("/isStaff", (req, res) => {
+    wifi
+      .getCurrentConnections()
+      .then((currentConnections) => {
+        if (currentConnections.length > 0) {
+          const ssid = currentConnections[0].mac;
+          res.json({ isStaff: ssid === process.env.STAFFSSID })
+
+        } else {
+          res.json({ isStaff: false })
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send('Error fetching WiFi information');
+      });
   })
 
   app.use("*", async (req, res) => {

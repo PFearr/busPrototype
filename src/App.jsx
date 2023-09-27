@@ -1,11 +1,31 @@
 import * as React from "react";
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { Routes, Route, Outlet, Link, useLocation } from "react-router-dom";
 import "./components/busPreview"
 import BusPreview from "./components/busPreview";
 import AdminPreview from "./components/busAdmin";
 import BusStatus from "./components/busstatus";
 import "./css/android.css"
+import HelpPage from "./components/helpPage";
 export default function App() {
+  const [helpPageHTML, setHelpPageHTML] = React.useState(`
+  <div style="padding-left: 25px; padding-bottom: 10px; height: 100%;">
+  <h1>Loading</h1>
+  <div class="loader"></div>
+  </div>
+  `);
+  React.useEffect(() => {
+    fetch("/help", {
+      method: "POST",
+      credentials: "include"
+    }).then((res) => {
+      // check if json
+      res.json().then((data) => {
+        setHelpPageHTML(data.html)
+      }).catch(()=>{
+        console.log("Failed")
+      })
+    })
+  },[])
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -14,7 +34,11 @@ export default function App() {
       </Route>
       <Route path="/status" element={<Layout />}>
         <Route index element={<BusStatus />} />
-        <Route path="*" element={<BusPreview />} />
+        <Route path="*" element={<BusStatus />} />
+      </Route>
+      <Route path="/help" element={<Layout />}>
+        <Route index element={<HelpPage html={helpPageHTML} />} />
+        <Route path="*" element={<HelpPage html={helpPageHTML} />} />
       </Route>
       <Route path="/admin/setbus" element={<Layout />}>
         <Route index element={<AdminPreview />} />
@@ -28,6 +52,7 @@ function Layout() {
   const [drawer, setDrawer] = React.useState(false);
   const [drawerRef, setDrawerRef] = React.useState(null);
   const [isStaff, setIsStaff] = React.useState(false);
+  const location = useLocation(); 
   React.useEffect(() => {
     fetch("/isStaff",{
       method: "GET",
@@ -55,6 +80,11 @@ function Layout() {
     }
 
   }, [drawerRef])
+  React.useEffect(() => {
+    setDrawer(false)
+  }, [location])
+
+  
   return (
     <div>
       <div className="app-bar">
@@ -80,7 +110,9 @@ function Layout() {
         <div className="app-title">Bus List</div>
       </div>
 
-      <aside className="start" ref={
+      <aside style={{
+        zIndex: 99999
+      }} className="start" ref={
         (el) => {
           setDrawerRef(el)
         }
@@ -100,6 +132,11 @@ function Layout() {
         <Link to="/status">
           Bus Status
         </Link>
+        {
+          import.meta.env.VITE_EnableHelpPage == "true" || import.meta.env.VITE_EnableHelpPage == true ? <Link to="/help">
+            Help Page
+          </Link> : null
+        }
         {
           isStaff ? <Link to="/admin/setbus">
             Admin Page
