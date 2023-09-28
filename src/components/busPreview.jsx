@@ -72,6 +72,7 @@ export default function BusPreview() {
             <main>
                 <div id="home" className="active">
                     <div className="bus-list" style={{
+                        marginLeft: "10%",
                         width: "50%",
                         height: "100%",
                         marginTop: "10%"
@@ -88,6 +89,26 @@ export default function BusPreview() {
                                 width={busSize.width} height={busSize.height} bus={
                                     bus
                                 } isLast={
+                                    index == busses.left.length - 1
+                                } />
+                            )
+                        })}</div>
+                    </div>
+                    <div className="bus-list" style={{
+                        width: "50%",
+                        height: "100%",
+                        marginTop: "10%"
+                    }}>
+                        <h1 >Middle</h1>
+                        <div style={{
+                            width: "50%",
+                            height: "100%"
+                        }}>{busses?.middle?.map((bus, index) => {
+                            return (
+                                <BusSvG index={
+                                    index
+                                }
+                                width={busSize.width} height={busSize.height} bus={bus} isLast={
                                     index == busses.left.length - 1
                                 } />
                             )

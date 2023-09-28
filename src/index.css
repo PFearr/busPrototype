@@ -68,6 +68,11 @@ code {
   .mobliefriendly-text {
     font-size: 1rem;
   }
+  .mobliefriendly-text-extra {
+    padding-left: 5rem;
+    padding-right: 5rem;
+    font-size: 1rem;
+  }
 }
 
 @media only screen and (max-device-width: 732px){

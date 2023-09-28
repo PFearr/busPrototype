@@ -18,6 +18,7 @@ export default (io) => {
             let amount = 11
             let clear = {
                 "left": [],
+                "middle": [],
                 "right": [],
                 "other": [],
                 "notHere": [],
@@ -25,6 +26,7 @@ export default (io) => {
             }
             for(let i = 0; i < amount; i++){
                 clear.left.push("")
+                clear.middle.push("")
                 clear.right.push("")
                 clear.other.push("")
             }

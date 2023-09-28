@@ -169,7 +169,7 @@ export default function BusPreview() {
                                             borderRadius: "5px",
                                             margin: "5px"
                                         }}>
-                                            <div className="bus-name mobliefriendly">All busses are here!</div>
+                                            <div className="bus-name mobliefriendly-text-extra">All busses are here!</div>
                                         </div> : null
                                     }
                                 </div></div>

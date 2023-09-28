@@ -270,6 +270,18 @@ export default function BusPreview() {
                                                         checked.push({ bus: bus, index: index, pos: "Left" });
                                                     }
                                                 });
+                                                busses.middle.forEach((bus, index) => {
+                                                    if (bus != "" && !duplicate) {
+                                                        for (let i = 0; i < checked.length; i++) {
+                                                            if (checked[i].bus == bus) {
+                                                                alert(`Duplicate ${checked[i].bus} busses at ${checked[i].pos} ${checked[i].index + 1} and Middle ${index + 1}`)
+                                                                duplicate = true;
+                                                                return;
+                                                            }
+                                                        }
+                                                        checked.push({ bus: bus, index: index, pos: "MIddle" });
+                                                    }
+                                                });
                                                 busses.right.forEach((bus, index) => {
                                                     if (bus != "" && !duplicate) {
                                                         for (let i = 0; i < checked.length; i++) {
@@ -356,6 +368,41 @@ export default function BusPreview() {
                                             width: "50%",
                                             height: "100%",
                                         }}>{busses?.left?.map((bus, index) => {
+                                            return (
+                                                <BusSvG index={
+                                                    index
+                                                }
+                                                    busses={
+                                                        busses
+                                                    }
+                                                    setBus={
+                                                        (bus, index) => {
+                                                            let newBusses = busses;
+                                                            newBusses.left[index] = bus;
+                                                            setBusses(newBusses);
+                                                        }
+                                                    }
+                                                    towns={
+                                                        towns
+                                                    }
+                                                    width={busSize.width} height={busSize.height} bus={
+                                                        bus
+                                                    } isLast={
+                                                        index == busses.left.length - 1
+                                                    } />
+                                            )
+                                        })}</div>
+                                    </div>
+                                    <div className="bus-list" style={{
+                                        width: "50%",
+                                        height: "100%",
+                                        marginTop: "10%"
+                                    }}>
+                                        <h1>Middle</h1>
+                                        <div style={{
+                                            width: "50%",
+                                            height: "100%",
+                                        }}>{busses?.middle?.map((bus, index) => {
                                             return (
                                                 <BusSvG index={
                                                     index
