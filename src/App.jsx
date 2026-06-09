@@ -134,12 +134,8 @@ function Layout() {
         }
       }>
         <div className="drawer-header">
-          {/* <div className="img-container">
-                        <img src="https://pbs.twimg.com/profile_images/853274726734610432/lLOgQznc_400x400.jpg" />
-                    </div> */}
           <div className="user-detail">
-            {/* <span className="email">ekoputrapratama@gmail.com</span> */}
-            <span className="displayName">ATHS Bus List</span>
+            <span className="displayName">Bus Bus List</span>
           </div>
         </div>
         <Link to="/">
